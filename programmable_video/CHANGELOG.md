@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Fixed Android build error due to the deprecation of the `kotlin-android-extensions` plugin.
+
 ## 1.1.0
 
 - Added `VideoRenderMode mode` as an optional parameter to the `widget` method of the `LocalVideoTrack`, and the `RemoteVideoTrack` classes. For backwards compatibility, it defaults to `VideoRenderMode.BALANCED`. 
