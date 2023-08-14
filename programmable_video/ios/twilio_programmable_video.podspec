@@ -16,10 +16,10 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'Flutter'
-  s.dependency 'TwilioVideo', '~> 4.6'
+  s.dependency 'TwilioVideo', '~> 5.7'
 
-  s.platform = :ios, '11.0'
-  s.ios.deployment_target = '11.0'
+  s.platform = :ios, '12.2'
+  s.ios.deployment_target = '12.2'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
