@@ -1,0 +1,486 @@
+image: cirrusci/flutter:stable
+
+stages:
+  - lint
+  - test
+  - publish
+
+.projects: &projects
+  parallel:
+    matrix:
+      - PROJECT: programmable_video
+      - PROJECT: programmable_video_platform_interface
+      - PROJECT: programmable_video_web
+
+dartdoc:
+  <<: *projects
+  stage: lint
+  script:
+    - cd "${PROJECT}"
+    - flutter pub get
+    - flutter pub global activate dartdoc
+    - flutter pub global run dartdoc --no-auto-include-dependencies --quiet # until the issue is resolved https://github.com/dart-lang/dartdoc/issues/2934 
+  only:
+    refs:
+      - merge_requests
+      - master
+    changes:
+      - "**/*.dart"
+      - "**/README.md"
+      - .gitlab-ci.yml
+
+firebase_functions_programmable_video:
+  image: node:8.15.0-alpine
+  stage: lint
+  script:
+    - cd programmable_video/example/firebase/functions || exit 1
+    - apk add --update git
+    - npm i
+    - npm run lint
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - programmable_video/example/firebase/functions/**/*
+      - .gitlab-ci.yml
+
+flutter_analyze:
+  <<: *projects
+  stage: lint
+  script:
+    - cd "${PROJECT}"
+    - flutter pub get
+    - flutter analyze --pub
+    - dart format -l 240 . --set-exit-if-changed
+  only:
+    refs:
+      - merge_requests
+      - master
+    changes:
+      - "**/pubspec.yaml"
+      - "**/*.dart"
+      - "**/test/**/*.dart"
+      - .gitlab-ci.yml
+
+kotlin_analyze_programmable_video:
+  image: kkopper/ktlint:0.36.0
+  stage: lint
+  script:
+    - cd programmable_video/android || exit 1
+    - ktlint
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - programmable_video/android/**/*.kt
+      - .gitlab-ci.yml
+
+pod_lint_programmable_video:
+  image: ruby:2.7-slim-buster
+  stage: lint
+  script:
+    - cd programmable_video/ios || exit 1
+    - apt-get update && apt-get install -y git curl unzip
+    - gem install cocoapods -v 1.8.4
+    - adduser --disabled-password --gecos "" cocoapods # Running as root is not allowed for CocoaPods
+    - export RUBYOPT='-W0' # Disable ruby deprecation warnings
+    - su cocoapods -c "pod lib lint --allow-warnings twilio_programmable_video.podspec"
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - programmable_video/ios/twilio_programmable_video.podspec
+      - .gitlab-ci.yml
+
+swift_analyze_programmable_video:
+  image: registry.gitlab.com/twilio-flutter/docker-swiftlint/docker-swiftlint:0.39.1
+  stage: lint
+  script:
+    - cd programmable_video/ios || exit 1
+    - swiftlint --strict
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - programmable_video/ios/**/*.swift
+      - .gitlab-ci.yml
+
+unit_test:
+  stage: test
+  script:
+    - cd programmable_video || exit 1
+    - flutter test --coverage --pub test
+    - cd ../programmable_video_platform_interface || exit 1
+    - flutter test --coverage --pub test
+    - cd ../ || exit 1
+    - sed -i 's/SF:/SF:programmable_video\//g' programmable_video/coverage/lcov.info
+    - sed -i 's/SF:/SF:programmable_video_platform_interface\//g' programmable_video_platform_interface/coverage/lcov.info
+    - lcov --add-tracefile ./programmable_video/coverage/lcov.info --add-tracefile ./programmable_video_platform_interface/coverage/lcov.info --output-file lcov_combined.info
+    - lcov --list lcov_combined.info
+  only:
+    refs:
+      - merge_requests
+      - master
+    changes:
+      - "**/pubspec.yaml"
+      - programmable_video/lib/**/*
+      - programmable_video/test/**/*
+      - programmable_video_platform_interface/lib/**/*
+      - programmable_video_platform_interface/test/**/*
+      - .gitlab-ci.yml
+
+pub_publish-dry_run-platform_interface:
+  stage: publish
+  script:
+    - cd programmable_video_platform_interface
+    - flutter pub publish --dry-run
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - ./programmable_video_platform_interface/**/*
+      - .gitlab-ci.yml
+
+pub_publish-dry_run-programmable_video:
+  stage: publish
+  script:
+    - cd programmable_video
+    - wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+    - platformInterfaceVersion=$(yq eval '.version' ../programmable_video_platform_interface/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_platform_interface=\"^${platformInterfaceVersion}\"" pubspec.yaml
+    - webVersion=$(yq eval '.version' ../programmable_video_web/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_web=\"^${webVersion}\"" pubspec.yaml
+    - flutter pub get
+    - flutter pub publish --dry-run
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - ./programmable_video/**/*
+      - .gitlab-ci.yml
+
+pub_publish-dry_run-programmable_video_web:
+  stage: publish
+  script:
+    - cd programmable_video_web
+    - wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+    - platformInterfaceVersion=$(yq eval '.version' ../programmable_video_platform_interface/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_platform_interface=\"^${platformInterfaceVersion}\"" pubspec.yaml
+    - flutter pub get
+    - flutter pub publish --dry-run
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - ./programmable_video_web/**/*
+      - .gitlab-ci.yml
+
+firebase_programmable_video:
+  image: andreysenov/firebase-tools
+  stage: publish
+  script:
+    # Deploy of functions only
+    - |
+      if [ -z "${FIREBASE_TOKEN}" ]; then
+        echo "Missing FIREBASE_TOKEN environment variable"
+        exit 1
+      fi
+
+      cd programmable_video/example/firebase/functions || exit 1
+      npm i
+      npm run build
+      cd .. || exit 1
+      firebase use twilio-flutter-plugin-dev --token ${FIREBASE_TOKEN}
+      firebase deploy --only functions -m "Version ${CI_COMMIT_REF_NAME} - Pipeline ${CI_PIPELINE_ID} - Build ${CI_BUILD_ID}" --token ${FIREBASE_TOKEN} --force
+  environment:
+    name: firebase
+    url: https://console.firebase.google.com/project/twilio-flutter-plugin-dev/overview
+  when: manual
+  only:
+    refs:
+      - /^programmable-video_v.*$/
+  except:
+    refs:
+      - branches
+
+pub-dev_platform_interface:
+  # https://robertohuertas.com/2019/01/20/publish-flutter-package-with-travis/
+  stage: publish
+  script:
+    - |
+      if [ -z "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_ACCESS_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_REFRESH_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_TOKEN_ENDPOINT environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_EXPIRATION}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_EXPIRATION environment variable"
+        exit 1
+      fi
+
+      cat <<EOF > ~/.pub-cache/credentials.json
+      {
+        "accessToken":"$(echo "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" | base64 -d)",
+        "refreshToken":"$(echo "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" | base64 -d)",
+        "tokenEndpoint":"${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}",
+        "scopes":["https://www.googleapis.com/auth/userinfo.email","openid"],
+        "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
+      }
+      EOF
+    - cd programmable_video_platform_interface
+    - flutter pub get
+    - flutter pub publish -f
+  only:
+    refs:
+      - /^programmable-video-platform-interface_v.*$/
+  except:
+    refs:
+      - branches
+
+pub-dev_programmable_video:
+  # https://robertohuertas.com/2019/01/20/publish-flutter-package-with-travis/
+  stage: publish
+  script:
+    - |
+      if [ -z "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_ACCESS_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_REFRESH_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_TOKEN_ENDPOINT environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_EXPIRATION}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_EXPIRATION environment variable"
+        exit 1
+      fi
+
+      cat <<EOF > ~/.pub-cache/credentials.json
+      {
+        "accessToken":"$(echo "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" | base64 -d)",
+        "refreshToken":"$(echo "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" | base64 -d)",
+        "tokenEndpoint":"${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}",
+        "scopes":["https://www.googleapis.com/auth/userinfo.email","openid"],
+        "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
+      }
+      EOF
+    - cd programmable_video
+    - wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+    - platformInterfaceVersion=$(yq eval '.version' ../programmable_video_platform_interface/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_platform_interface=\"^${platformInterfaceVersion}\"" pubspec.yaml
+    - webVersion=$(yq eval '.version' ../programmable_video_web/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_web=\"^${webVersion}\"" pubspec.yaml
+    - flutter pub get
+    - flutter pub publish -f
+  only:
+    refs:
+      - /^programmable-video_v.*$/
+  except:
+    refs:
+      - branches
+
+pub-dev_programmable_web:
+  # https://robertohuertas.com/2019/01/20/publish-flutter-package-with-travis/
+  stage: publish
+  script:
+    - |
+      if [ -z "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_ACCESS_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_REFRESH_TOKEN environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_TOKEN_ENDPOINT environment variable"
+        exit 1
+      fi
+
+      if [ -z "${PUB_DEV_PUBLISH_EXPIRATION}" ]; then
+        echo "Missing PUB_DEV_PUBLISH_EXPIRATION environment variable"
+        exit 1
+      fi
+
+      cat <<EOF > ~/.pub-cache/credentials.json
+      {
+        "accessToken":"$(echo "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" | base64 -d)",
+        "refreshToken":"$(echo "${PUB_DEV_PUBLISH_REFRESH_TOKEN}" | base64 -d)",
+        "tokenEndpoint":"${PUB_DEV_PUBLISH_TOKEN_ENDPOINT}",
+        "scopes":["https://www.googleapis.com/auth/userinfo.email","openid"],
+        "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
+      }
+      EOF
+    - cd programmable_video_web
+    - wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+    - platformInterfaceVersion=$(yq eval '.version' ../programmable_video_platform_interface/pubspec.yaml | sed 's/\+.*$//')
+    - yq eval -i ".dependencies.twilio_programmable_video_platform_interface=\"^${platformInterfaceVersion}\"" pubspec.yaml
+    - flutter pub get
+    - flutter pub publish -f
+  only:
+    refs:
+      - /^programmable-video-web_v.*$/
+  except:
+    refs:
+      - branches
+
+changelog_programmable_video:
+  image: curlimages/curl
+  stage: publish
+  script:
+    - |
+      cd programmable_video || exit 1
+
+      if [ -z "${DISCORD_WEBHOOK}" ]; then
+        echo "Missing DISCORD_WEBHOOK environment variable"
+        exit 1
+      fi
+
+      TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
+      PUB_SPEC_NAME="$(awk '/^name: /{print $NF}' pubspec.yaml)"
+      CHANGELOG_MESSAGE=$(sed '1,/^##/!d;/##/d' CHANGELOG.md | awk '{printf "%s\\n", $0}')
+
+      DATA='{
+        "embeds": [ {
+          "author": {
+            "name": "'"$CI_PROJECT_NAME"'",
+            "url": "https://pub.dev/packages/'"$PUB_SPEC_NAME"'/versions/'"$TAG_NAME"'",
+            "icon_url": "https://assets.gitlab-static.net/uploads/-/system/project/avatar/'"$CI_PROJECT_ID"'/'"$CI_PROJECT_NAME"'.png?width=64"
+          },
+          "description": "Version `'"$TAG_NAME"'` has just been released on pub.dev",
+          "fields": [
+            {
+              "name": "Changelog",
+              "value": "```markdown'"${CHANGELOG_MESSAGE}"'```",
+              "inline": false
+            },
+            {
+              "name": "Pipeline",
+              "value": "['"$CI_PIPELINE_IID"']('"$CI_PROJECT_URL/pipelines/$CI_PIPELINE_IID"')",
+              "inline": true
+            },
+            {
+              "name": "Commit",
+              "value": "['"$CI_COMMIT_SHORT_SHA"']('"$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"')",
+              "inline": true
+            }
+          ]
+        } ]
+      }'
+
+      curl --fail -H Content-Type:application/json -d "$DATA" $DISCORD_WEBHOOK
+  only:
+    refs:
+      - /^programmable-video_v.*$/
+  except:
+    refs:
+      - branches
+
+tag_programmable_video:
+  image: curlimages/curl
+  stage: publish
+  script:
+    - |
+      cd programmable_video || exit 1
+
+      if [ -z "${GITLAB_API_TOKEN}" ]; then
+        echo "Missing GITLAB_API_TOKEN environment variable"
+        exit 1
+      fi
+
+      export TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
+      curl --fail --request POST --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        --data-urlencode "tag_name=programmable-video_v${TAG_NAME}" \
+        --data-urlencode "ref=${CI_COMMIT_REF_NAME}" \
+        --data-urlencode "message=Check the [CHANGELOG.md](${CI_PROJECT_URL}/-/blob/${CI_COMMIT_REF_NAME}/programmable_video/CHANGELOG.md)" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags"
+  environment:
+    name: pub-dev-plugin
+    url: https://pub.dev/packages/twilio_programmable_video
+  when: manual
+  only:
+    refs:
+      - master
+      - web
+    changes:
+      - programmable_video/**/*
+      - .gitlab-ci.yml
+
+tag_platform_interface:
+  image: curlimages/curl
+  stage: publish
+  script:
+    - |
+      cd programmable_video_platform_interface || exit 1
+
+      if [ -z "${GITLAB_API_TOKEN}" ]; then
+        echo "Missing GITLAB_API_TOKEN environment variable"
+        exit 1
+      fi
+
+      export TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
+      curl --fail --request POST --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        --data-urlencode "tag_name=programmable-video-platform-interface_v${TAG_NAME}" \
+        --data-urlencode "ref=${CI_COMMIT_REF_NAME}" \
+        --data-urlencode "message=Check the [CHANGELOG.md](${CI_PROJECT_URL}/-/blob/${CI_COMMIT_REF_NAME}/programmable_video_platform_interface/CHANGELOG.md)" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags"
+  environment:
+    name: pub-dev-platform-interface
+    url: https://pub.dev/packages/twilio_programmable_video_platform_interface
+  when: manual
+  only:
+    refs:
+      - master
+      - web
+    changes:
+      - programmable_video_platform_interface/**/*
+      - .gitlab-ci.yml
+
+tag_platform_web:
+  image: curlimages/curl
+  stage: publish
+  script:
+    - |
+      cd programmable_video_web || exit 1
+
+      if [ -z "${GITLAB_API_TOKEN}" ]; then
+        echo "Missing GITLAB_API_TOKEN environment variable"
+        exit 1
+      fi
+
+      export TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
+      curl --fail --request POST --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        --data-urlencode "tag_name=programmable-video-web_v${TAG_NAME}" \
+        --data-urlencode "ref=${CI_COMMIT_REF_NAME}" \
+        --data-urlencode "message=Check the [CHANGELOG.md](${CI_PROJECT_URL}/-/blob/${CI_COMMIT_REF_NAME}/programmable_video_web/CHANGELOG.md)" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags"
+  environment:
+    name: pub-dev-web
+    url: https://pub.dev/packages/twilio_programmable_video_web
+  when: manual
+  only:
+    refs:
+      - master
+      - web
+    changes:
+      - programmable_video_web/**/*
+      - .gitlab-ci.yml
