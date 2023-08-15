@@ -18,12 +18,12 @@ dependencies:
     git:
       url: https://github.com/martintrollip/programmable-video.git
       path: programmable_video_platform_interface
-      ref: d7d9948960685fb1af49666e6ee81e10d52bc841
+      ref: 1.1.1
   twilio_programmable_video_web:
     git:
       url: https://github.com/martintrollip/programmable-video.git
       path: programmable_video_web
-      ref: d7d9948960685fb1af49666e6ee81e10d52bc841
+      ref: 1.1.1
   collection: ^1.15.0
 
 dev_dependencies:
