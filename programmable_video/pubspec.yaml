@@ -15,15 +15,9 @@ dependencies:
   permission_handler: ^10.2.0
   enum_to_string: ^2.0.1
   twilio_programmable_video_platform_interface:
-    git:
-      url: https://github.com/martintrollip/programmable-video.git
-      path: programmable_video_platform_interface
-      ref: 1.1.1
+    path: ../programmable_video_platform_interface
   twilio_programmable_video_web:
-    git:
-      url: https://github.com/martintrollip/programmable-video.git
-      path: programmable_video_web
-      ref: 1.1.1
+    path: ../programmable_video_web
   collection: ^1.15.0
 
 dev_dependencies:

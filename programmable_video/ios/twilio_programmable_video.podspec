@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'Flutter'
-  s.dependency 'TwilioVideo', '~> 5.7'
+  s.dependency 'TwilioVideo', '~> 5'
 
   s.platform = :ios, '12.2'
   s.ios.deployment_target = '12.2'
