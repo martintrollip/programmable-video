@@ -28,8 +28,8 @@ class AudioNotificationListener() : BaseListener() {
             debug("onServiceConnected => profile: $profile, proxy: $proxy")
             if (profile == BluetoothProfile.HEADSET) {
                 bluetoothProfile = proxy
-                if (bluetoothProfile!!.connectedDevices.size > 0 &&
-                    TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.bluetoothPreferred) {
+                if (TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.bluetoothPreferred && 
+                    bluetoothProfile!!.connectedDevices.size > 0) {
                     TwilioProgrammableVideoPlugin.pluginHandler.applyAudioSettings()
                 }
             }
