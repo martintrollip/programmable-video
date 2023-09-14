@@ -343,6 +343,12 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
 
         audioSettings.speakerEnabled = speakerphoneEnabled
         audioSettings.bluetoothPreferred = bluetoothPreferred
+        /// $this and TwilioProgrammableVideoPlugin.pluginHandler can refer to two separate instances of PluginHandler
+        /// The audioNotificationListener checks TwilioProgrammableVideoPlugin.pluginHandler. 
+        /// Investigations are required and so far it seems that onAttachedToEngine is called multiple times 
+        /// creating new instances of the PluginHandler but not of the listener
+        TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.speakerEnabled = speakerphoneEnabled
+        TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.bluetoothPreferred = bluetoothPreferred
 
         TwilioProgrammableVideoPlugin.audioNotificationListener.listenForRouteChanges(applicationContext)
 
