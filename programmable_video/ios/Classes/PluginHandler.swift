@@ -609,8 +609,6 @@ public class PluginHandler: BaseListener {
                 var audioCodecs: [AudioCodec] = []
                 for (_, audioCodec) in preferredAudioCodecs {
                     switch audioCodec {
-                    case "isac":
-                        audioCodecs.append(IsacCodec())
                     case "PCMA":
                         audioCodecs.append(PcmaCodec())
                     case "PCMU":
