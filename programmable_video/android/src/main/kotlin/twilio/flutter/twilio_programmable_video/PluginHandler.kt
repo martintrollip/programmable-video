@@ -19,7 +19,6 @@ import com.twilio.video.ConnectOptions
 import com.twilio.video.DataTrackOptions
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalDataTrack
 import com.twilio.video.LocalParticipant
@@ -528,7 +527,6 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
                 val audioCodecs = ArrayList<AudioCodec>()
                 for ((audioCodec) in preferredAudioCodecs) {
                     when (audioCodec) {
-                        IsacCodec.NAME -> audioCodecs.add(IsacCodec())
                         OpusCodec.NAME -> audioCodecs.add(OpusCodec())
                         PcmaCodec.NAME -> audioCodecs.add(PcmaCodec())
                         PcmuCodec.NAME -> audioCodecs.add(PcmuCodec())

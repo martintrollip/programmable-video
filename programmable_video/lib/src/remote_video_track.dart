@@ -17,15 +17,21 @@ class RemoteVideoTrack extends VideoTrack {
   ) : super(_enabled, _name);
 
   /// Construct from a [RemoteVideoTrackModel].
-  factory RemoteVideoTrack._fromModel(RemoteVideoTrackModel model, RemoteParticipant remoteParticipant) {
-    return RemoteVideoTrack(model.sid, model.enabled, model.name, remoteParticipant);
+  factory RemoteVideoTrack._fromModel(
+      RemoteVideoTrackModel model, RemoteParticipant remoteParticipant) {
+    return RemoteVideoTrack(
+        model.sid, model.enabled, model.name, remoteParticipant);
   }
 
   /// Returns a native widget.
   ///
   /// By default the widget will not be mirrored, to change that set [mirror] to true.
   /// If you provide a [key] make sure it is unique among all [VideoTrack]s otherwise Flutter might send the wrong creation params to the native side.
-  Widget widget({bool mirror = false, VideoRenderMode mode = VideoRenderMode.BALANCED, Key? key}) {
+  Widget widget(
+      {bool mirror = false,
+      VideoRenderMode mode = VideoRenderMode.BALANCED,
+      Key? key}) {
+    print('Martin! meh! nirror');
     key ??= ValueKey(_sid);
     final remoteParticipantSid = _remoteParticipant.sid;
 
@@ -37,6 +43,7 @@ class RemoteVideoTrack extends VideoTrack {
       );
     }
 
+    print('Martin! meh!');
     return ProgrammableVideoPlatform.instance.createRemoteVideoTrackWidget(
       remoteParticipantSid: remoteParticipantSid,
       remoteVideoTrackSid: _sid,
