@@ -53,7 +53,13 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
           );
         },
         onCreatePlatformView: (params) {
-          return PlatformViewsService.initExpensiveAndroidView(id: params.id, viewType: viewType, layoutDirection: TextDirection.ltr, creationParams: creationParams)
+          return PlatformViewsService.initExpensiveAndroidView(
+            id: params.id,
+            viewType: viewType,
+            layoutDirection: TextDirection.ltr,
+            creationParams: creationParams,
+            creationParamsCodec: const StandardMessageCodec(),
+          )
             ..requiresViewComposition
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
             ..create();
