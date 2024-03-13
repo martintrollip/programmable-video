@@ -42,7 +42,6 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
 
   Widget _videoTrackWidget(Map<String, Object> creationParams, Key key) {
     if (Platform.isAndroid) {
-      print('Martin! meh0');
       final viewType = 'twilio_programmable_video/views';
       return PlatformViewLink(
         viewType: viewType,
@@ -54,7 +53,6 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
           );
         },
         onCreatePlatformView: (params) {
-          print('Martin! meh1');
           return PlatformViewsService.initExpensiveAndroidView(id: params.id, viewType: viewType, layoutDirection: TextDirection.ltr, creationParams: creationParams)
             ..requiresViewComposition
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
@@ -99,7 +97,6 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
     VideoRenderMode mode = VideoRenderMode.BALANCED,
     Key? key,
   }) {
-    print('Martin! creating');
     key ??= ValueKey(remoteParticipantSid);
 
     final creationParams = {
