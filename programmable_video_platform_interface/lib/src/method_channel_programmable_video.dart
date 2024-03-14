@@ -52,17 +52,19 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
             gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
           );
         },
-        onCreatePlatformView: (params) {
-          return PlatformViewsService.initExpensiveAndroidView(
+        onCreatePlatformView: (PlatformViewCreationParams params) {
+          final AndroidViewController controller = PlatformViewsService.initExpensiveAndroidView(
             id: params.id,
             viewType: viewType,
             layoutDirection: TextDirection.ltr,
             creationParams: creationParams,
             creationParamsCodec: const StandardMessageCodec(),
-            onFocus: () => params.onFocusChanged,
-          )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..create();
+            onFocus: () => params.onFocusChanged(true),
+          );
+          controller.addOnPlatformViewCreatedListener(
+            params.onPlatformViewCreated,
+          );
+          return controller;
         },
       );
     }

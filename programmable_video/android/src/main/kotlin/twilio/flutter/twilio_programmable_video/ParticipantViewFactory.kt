@@ -54,6 +54,10 @@ class ParticipantViewFactory(createArgsCodec: MessageCodec<Any>, private val plu
         val scaleType = this.getScaleTypeFromInt(params["renderMode"] as Int)
         videoView.mirror = params["mirror"] as Boolean
         videoView.videoScaleType = scaleType
+        videoView.setEnableHardwareScaler(false)
+        if (params["isLocal"] == true) {
+            videoView.setZOrderOnTop(true)
+        }
 
         return ParticipantView(videoView, videoTrack)
     }
