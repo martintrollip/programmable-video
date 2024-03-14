@@ -60,7 +60,6 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
             creationParams: creationParams,
             creationParamsCodec: const StandardMessageCodec(),
           )
-            ..requiresViewComposition
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
             ..create();
         },
