@@ -1,5 +1,8 @@
 name: twilio_programmable_video
 description: Flutter plugin for Twilio Programmable Video, which enables you to build real-time videocall applications (WebRTC)
+homepage: https://gitlab.com/twilio-flutter/programmable-video
+repository: https://gitlab.com/twilio-flutter/programmable-video/-/tree/master/programmable_video
+issue_tracker: https://gitlab.com/twilio-flutter/programmable-video/issues
 version: 1.2.0
 
 environment:
