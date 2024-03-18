@@ -57,6 +57,9 @@ class ParticipantViewFactory(createArgsCodec: MessageCodec<Any>, private val plu
         videoView.setEnableHardwareScaler(false)
         if (params["isLocal"] == true) {
             videoView.setZOrderOnTop(true)
+            videoView.applyZOrder(true)
+        } else {
+            videoView.setZOrderOnTop(false)
         }
 
         return ParticipantView(videoView, videoTrack)
