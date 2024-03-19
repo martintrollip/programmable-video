@@ -26,15 +26,12 @@ dependencies:
       ref: 1.2.0
   collection: ^1.18.0
 
-# For local testing
-#
-# Replace above with twilio_programmable_video_platform_interface: any
-#
-# dependency_overrides:
-#   twilio_programmable_video_platform_interface:
-#     path: ../programmable_video_platform_interface
-#   twilio_programmable_video_web:
-#     path: ../programmable_video_web
+# Comment for local testing
+dependency_overrides:
+  twilio_programmable_video_platform_interface:
+    path: ../programmable_video_platform_interface
+  twilio_programmable_video_web:
+    path: ../programmable_video_web
 
 dev_dependencies:
   flutter_test:
