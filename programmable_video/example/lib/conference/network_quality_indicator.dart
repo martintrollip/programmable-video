@@ -241,6 +241,8 @@ class _NetworkQualityIndicatorState extends State<NetworkQualityIndicator> {
           bottom = 0.0 + (widget.bottom ?? 0.0);
           right = 0.0 + (widget.right ?? 0.0);
           break;
+        case null:
+        // ignore
       }
     } else {
       top = widget.top;

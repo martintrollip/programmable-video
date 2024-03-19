@@ -25,9 +25,6 @@ dependencies:
   version: ^2.0.0
   collection: ^1.15.0
 
-dev_dependencies:
-  pedantic: ^1.8.0+1
-
 # For local testing
 #
 # Replace above with twilio_programmable_video_platform_interface: any
