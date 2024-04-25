@@ -3,7 +3,7 @@ description: Flutter plugin for Twilio Programmable Video, which enables you to 
 homepage: https://gitlab.com/twilio-flutter/programmable-video
 repository: https://gitlab.com/twilio-flutter/programmable-video/-/tree/master/programmable_video
 issue_tracker: https://gitlab.com/twilio-flutter/programmable-video/issues
-version: 1.2.0
+version: 1.2.1
 
 environment:
   sdk: '>=3.3.0-0 <4.0.0'
@@ -18,12 +18,12 @@ dependencies:
     git:
       url: https://github.com/martintrollip/programmable-video.git
       path: programmable_video_platform_interface
-      ref: 1.2.0
+      ref: 1.2.1
   twilio_programmable_video_web: 
     git:
       url: https://github.com/martintrollip/programmable-video.git
       path: programmable_video_web
-      ref: 1.2.0
+      ref: 1.2.1
   collection: ^1.18.0
 
 # Comment for local testing
