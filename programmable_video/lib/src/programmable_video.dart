@@ -80,7 +80,11 @@ class TwilioProgrammableVideo {
   /// For native logging set [native] to `true` and for dart set [dart] to `true`.
   static Future<void> debug({bool dart = false, bool native = false, bool audio = false}) async {
     _dartDebug = dart;
+    print('Martin! meh1');
+
     await ProgrammableVideoPlatform.instance.setNativeDebug(native, audio);
+    print('Martin! meh2');
+
     if ((native || audio) && _loggingStream == null) {
       _loggingStream = ProgrammableVideoPlatform.instance.loggingStream().listen((dynamic event) {
         if (native || audio) {

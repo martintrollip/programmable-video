@@ -1,4 +1,7 @@
 {
     "dart.lineLength": 240,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "cSpell.words": [
+        "dartlin"
+    ]
 }

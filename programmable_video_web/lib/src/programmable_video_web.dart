@@ -46,6 +46,7 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
   }
 
   static void registerWith(Registrar registrar) {
+    print('Martin! meh');
     ProgrammableVideoPlatform.instance = ProgrammableVideoPlugin();
   }
 
