@@ -46,7 +46,6 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
   }
 
   static void registerWith(Registrar registrar) {
-    print('Martin! meh');
     ProgrammableVideoPlatform.instance = ProgrammableVideoPlugin();
   }
 
@@ -376,5 +375,20 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
   Stream<dynamic> loggingStream() {
     return _loggingStreamController.stream;
   }
+
+  Future setAudioSettings(bool speakerphoneEnabled, bool bluetoothPreferred) async {}
+
+  Future disableAudioSettings() async {}
+
+  Future<void> createVideoTrack(LocalVideoTrackModel localVideoTrack) async {}
+
+  Future<void> publishVideoTrack(String name) async {}
+
+  Future<void> unpublishVideoTrack(String name) async {}
+
+  Future<void> releaseVideoTrack(String name) async {}
+
+  // Stream<BaseAudioNotificationEvent> audioNotificationStream() async {}
+
 //#endregion
 }
