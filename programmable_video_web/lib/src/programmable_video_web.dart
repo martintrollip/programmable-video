@@ -133,7 +133,7 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
 
     final twilioVersion = Version.parse(version);
     if (twilioVersion.major != supportedVersion.major || (twilioVersion.major == supportedVersion.major && twilioVersion.minor > supportedVersion.minor)) {
-      throw UnsupportedError('Current supported JS version is: $supportedVersion');
+      throw UnsupportedError('Current supported Twilio JS version is: $supportedVersion');
     }
 
     try {
