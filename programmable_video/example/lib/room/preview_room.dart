@@ -9,7 +9,7 @@ import 'package:twilio_programmable_video_example/shared/services/backend_servic
 class PreviewRoom with ChangeNotifier {
   late CameraCapturer _cameraCapturer;
   late LocalVideoTrack? localVideoTrack;
-  final _roomBloc = RoomBloc(backendService: FirebaseFunctionsService.instance);
+  final _roomBloc = RoomBloc(backendService: NoOpBackendService());
   late Room _room;
 
   Future<void> init() async {
