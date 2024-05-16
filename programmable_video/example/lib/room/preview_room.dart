@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:twilio_programmable_video/twilio_programmable_video.dart';
 import 'package:twilio_programmable_video_example/models/twilio_enums.dart';
@@ -20,7 +21,7 @@ class PreviewRoom with ChangeNotifier {
   Future<void> _initCameraCapturer() async {
     final sources = await CameraSource.getSources();
     _cameraCapturer = CameraCapturer(
-      sources.firstWhere((source) => source.isBackFacing),
+      sources.firstWhereOrNull((source) => source.isFrontFacing),
     );
   }
 

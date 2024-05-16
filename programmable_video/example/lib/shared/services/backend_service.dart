@@ -32,7 +32,7 @@ class NoOpBackendService implements BackendService {
   Future<TwilioRoomTokenResponse> createToken(TwilioRoomTokenRequest twilioRoomTokenRequest) async {
     return TwilioRoomTokenResponse(
       identity: 'identity',
-      token: 'token',
+      token: '<<< YOUR TWILIO TOKEN GOES HERE >>>',
     );
   }
 

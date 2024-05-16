@@ -388,7 +388,9 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
 
   Future<void> releaseVideoTrack(String name) async {}
 
-  // Stream<BaseAudioNotificationEvent> audioNotificationStream() async {}
+  Stream<BaseAudioNotificationEvent> audioNotificationStream() {
+    return Stream.empty();
+  }
 
 //#endregion
 }
