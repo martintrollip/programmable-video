@@ -133,7 +133,7 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
 
     final twilioVersion = Version.parse(version);
     if (twilioVersion.major != supportedVersion.major || (twilioVersion.major == supportedVersion.major && twilioVersion.minor > supportedVersion.minor)) {
-      throw UnsupportedError('Current supported JS version is: $supportedVersion');
+      throw UnsupportedError('Current supported Twilio JS version is: $supportedVersion');
     }
 
     try {
@@ -375,5 +375,22 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
   Stream<dynamic> loggingStream() {
     return _loggingStreamController.stream;
   }
+
+  Future setAudioSettings(bool speakerphoneEnabled, bool bluetoothPreferred) async {}
+
+  Future disableAudioSettings() async {}
+
+  Future<void> createVideoTrack(LocalVideoTrackModel localVideoTrack) async {}
+
+  Future<void> publishVideoTrack(String name) async {}
+
+  Future<void> unpublishVideoTrack(String name) async {}
+
+  Future<void> releaseVideoTrack(String name) async {}
+
+  Stream<BaseAudioNotificationEvent> audioNotificationStream() {
+    return Stream.empty();
+  }
+
 //#endregion
 }

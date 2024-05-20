@@ -148,7 +148,7 @@ A simple way to do this would be to add the following line to your `<head>` in t
   <head>
     ...
 
-    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.14.0/twilio-video.min.js"></script>
+    <script src="https://sdk.twilio.com/js/video/releases/2.28.1/twilio-video.min.js"></script>
   </head>
   ....
 </html>
