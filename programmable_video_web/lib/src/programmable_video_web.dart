@@ -53,12 +53,9 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
     ui.platformViewRegistry.registerViewFactory('local-video-track-html', (int viewId) {
       final room = _room;
       if (room != null) {
-        final localVideoTrackElement = room.localParticipant.videoTracks.values().next().value.track.attach()
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..style.objectFit = _getObjectFit(mode);
+        final localVideoTrackElement = room.localParticipant.videoTracks.values().next().value.track.attach()..style.objectFit = _getObjectFit(mode);
         debug('Created local video track view for: $localParticipantSid');
-        return DivElement()..append(localVideoTrackElement);
+        return localVideoTrackElement;
       } else {
         // TODO: review behaviour in scenario where `_room` is `null`.
         return DivElement();
@@ -71,12 +68,9 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
       final remoteVideoTrack = _room?.participants.toDartMap()[remoteParticipantSid]?.videoTracks.toDartMap()[remoteVideoTrackSid]?.track;
       // TODO: flatten this out
       if (remoteVideoTrack != null) {
-        final remoteVideoTrackElement = remoteVideoTrack.attach()
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..style.objectFit = _getObjectFit(mode);
+        final remoteVideoTrackElement = remoteVideoTrack.attach()..style.objectFit = _getObjectFit(mode);
         debug('Created remote video track view for: $remoteParticipantSid');
-        return DivElement()..append(remoteVideoTrackElement);
+        return remoteVideoTrackElement;
       } else {
         // TODO: review behaviour in scenario where `_room` is `null`.
         return DivElement();
@@ -139,7 +133,7 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
 
     final twilioVersion = Version.parse(version);
     if (twilioVersion.major != supportedVersion.major || (twilioVersion.major == supportedVersion.major && twilioVersion.minor > supportedVersion.minor)) {
-      throw UnsupportedError('Current supported JS version is: $supportedVersion');
+      throw UnsupportedError('Current supported Twilio JS version is: $supportedVersion');
     }
 
     try {
@@ -381,5 +375,22 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
   Stream<dynamic> loggingStream() {
     return _loggingStreamController.stream;
   }
+
+  Future setAudioSettings(bool speakerphoneEnabled, bool bluetoothPreferred) async {}
+
+  Future disableAudioSettings() async {}
+
+  Future<void> createVideoTrack(LocalVideoTrackModel localVideoTrack) async {}
+
+  Future<void> publishVideoTrack(String name) async {}
+
+  Future<void> unpublishVideoTrack(String name) async {}
+
+  Future<void> releaseVideoTrack(String name) async {}
+
+  Stream<BaseAudioNotificationEvent> audioNotificationStream() {
+    return Stream.empty();
+  }
+
 //#endregion
 }

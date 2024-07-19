@@ -32,7 +32,6 @@
 pubspec.lock
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Android related
 # Disabled gradle-wrapper.jar in this ignore due to Codemagic

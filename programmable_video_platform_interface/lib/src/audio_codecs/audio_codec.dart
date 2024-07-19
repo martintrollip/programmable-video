@@ -1,5 +1,4 @@
 export 'g722_codec.dart';
-export 'isac_codec.dart';
 export 'opus_codec.dart';
 export 'pcma_codec.dart';
 export 'pcmu_codec.dart';

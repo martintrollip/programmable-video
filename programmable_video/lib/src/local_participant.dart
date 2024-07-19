@@ -196,7 +196,7 @@ class LocalParticipant implements Participant {
     } else if (event is LocalVideoTrackPublicationFailed) {
       final localVideoTrack = LocalVideoTrack._fromModel(event.localVideoTrack);
       _onVideoTrackPublicationFailed.add(LocalVideoTrackPublicationFailedEvent(this, localVideoTrack, TwilioException._fromModel(event.exception)));
-    } else if (event is LocalNetworkQualityLevelChanged) {
+    } else if (event is LocalNetworkQualityLevelChanged && !_onNetworkQualityLevelChanged.isClosed) {
       _onNetworkQualityLevelChanged.add(LocalNetworkQualityLevelChangedEvent(this, event.networkQualityLevel));
     }
   }

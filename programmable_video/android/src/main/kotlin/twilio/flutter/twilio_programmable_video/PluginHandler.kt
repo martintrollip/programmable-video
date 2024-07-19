@@ -19,7 +19,6 @@ import com.twilio.video.ConnectOptions
 import com.twilio.video.DataTrackOptions
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalDataTrack
 import com.twilio.video.LocalParticipant
@@ -343,6 +342,12 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
 
         audioSettings.speakerEnabled = speakerphoneEnabled
         audioSettings.bluetoothPreferred = bluetoothPreferred
+        /// $this and TwilioProgrammableVideoPlugin.pluginHandler can refer to two separate instances of PluginHandler
+        /// The audioNotificationListener checks TwilioProgrammableVideoPlugin.pluginHandler. 
+        /// Investigations are required and so far it seems that onAttachedToEngine is called multiple times 
+        /// creating new instances of the PluginHandler but not of the listener
+        TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.speakerEnabled = speakerphoneEnabled
+        TwilioProgrammableVideoPlugin.pluginHandler.audioSettings.bluetoothPreferred = bluetoothPreferred
 
         TwilioProgrammableVideoPlugin.audioNotificationListener.listenForRouteChanges(applicationContext)
 
@@ -423,7 +428,7 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
     }
 
     private fun setSpeakerPhoneOnInternal() {
-        val bluetoothProfileConnectionState = BluetoothAdapter.getDefaultAdapter().getProfileConnectionState(BluetoothProfile.HEADSET)
+        val bluetoothProfileConnectionState = BluetoothAdapter.getDefaultAdapter()?.getProfileConnectionState(BluetoothProfile.HEADSET)
         debug("setSpeakerPhoneOnInternal => on: ${audioSettings.speakerEnabled}\n bluetoothEnable: ${audioSettings.bluetoothPreferred}\n bluetoothScoOn: ${audioManager.isBluetoothScoOn}\n bluetoothProfileConnectionState: $bluetoothProfileConnectionState")
 
         // Even if already enabled, setting `audioManager.isSpeakerphoneOn` to true
@@ -522,7 +527,6 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
                 val audioCodecs = ArrayList<AudioCodec>()
                 for ((audioCodec) in preferredAudioCodecs) {
                     when (audioCodec) {
-                        IsacCodec.NAME -> audioCodecs.add(IsacCodec())
                         OpusCodec.NAME -> audioCodecs.add(OpusCodec())
                         PcmaCodec.NAME -> audioCodecs.add(PcmaCodec())
                         PcmuCodec.NAME -> audioCodecs.add(PcmuCodec())

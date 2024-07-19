@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -21,32 +20,23 @@ void main() {
 class TwilioProgrammableVideoExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Firebase.initializeApp(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Provider<BackendService>(
-            create: (_) => FirebaseFunctionsService.instance,
-            child: MaterialApp(
-              title: 'Twilio Programmable Video',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                appBarTheme: AppBarTheme(
-                  color: Colors.blue,
-                  titleTextStyle: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              home: SelectionPage(),
+    return Provider<BackendService>(
+      create: (_) => NoOpBackendService(),
+      child: MaterialApp(
+        title: 'Twilio Programmable Video',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          appBarTheme: AppBarTheme(
+            color: Colors.blue,
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+          ),
+        ),
+        home: SelectionPage(),
+      ),
     );
   }
 }

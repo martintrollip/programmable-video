@@ -11,7 +11,7 @@ import 'package:twilio_programmable_video_example/debug.dart';
 import 'package:twilio_programmable_video_example/room/room_model.dart';
 import 'package:twilio_programmable_video_example/shared/widgets/noise_box.dart';
 import 'package:twilio_programmable_video_example/shared/widgets/platform_alert_dialog.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ConferencePage extends StatefulWidget {
   final RoomModel roomModel;
@@ -102,8 +102,8 @@ class _ConferencePageState extends State<ConferencePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvoked: (_) async => false,
+    return WillPopScope(
+      onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: buildLayout(),
@@ -392,7 +392,7 @@ class _ConferencePageState extends State<ConferencePage> {
 
   Future<void> _wakeLock(bool enable) async {
     try {
-      return await (enable ? Wakelock.enable() : Wakelock.disable());
+      return await (enable ? WakelockPlus.enable() : WakelockPlus.disable());
     } catch (err) {
       Debug.log('Unable to change the Wakelock and set it to $enable');
       Debug.log(err);

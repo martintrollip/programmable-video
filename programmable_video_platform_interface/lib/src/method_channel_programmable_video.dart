@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/widgets.dart';
@@ -39,11 +42,30 @@ class MethodChannelProgrammableVideo extends ProgrammableVideoPlatform {
 
   Widget _videoTrackWidget(Map<String, Object> creationParams, Key key) {
     if (Platform.isAndroid) {
-      return AndroidView(
-        key: key,
-        viewType: 'twilio_programmable_video/views',
-        creationParams: creationParams,
-        creationParamsCodec: const StandardMessageCodec(),
+      final viewType = 'twilio_programmable_video/views';
+      return PlatformViewLink(
+        viewType: viewType,
+        surfaceFactory: (context, controller) {
+          return AndroidViewSurface(
+            controller: controller as AndroidViewController,
+            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+          );
+        },
+        onCreatePlatformView: (PlatformViewCreationParams params) {
+          final AndroidViewController controller = PlatformViewsService.initExpensiveAndroidView(
+            id: params.id,
+            viewType: viewType,
+            layoutDirection: TextDirection.ltr,
+            creationParams: creationParams,
+            creationParamsCodec: const StandardMessageCodec(),
+            onFocus: () => params.onFocusChanged(true),
+          );
+          controller.addOnPlatformViewCreatedListener(
+            params.onPlatformViewCreated,
+          );
+          return controller;
+        },
       );
     }
 
