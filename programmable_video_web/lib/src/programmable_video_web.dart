@@ -53,9 +53,12 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
     ui.platformViewRegistry.registerViewFactory('local-video-track-html', (int viewId) {
       final room = _room;
       if (room != null) {
-        final localVideoTrackElement = room.localParticipant.videoTracks.values().next().value.track.attach()..style.objectFit = _getObjectFit(mode);
+        final localVideoTrackElement = room.localParticipant.videoTracks.values().next().value.track.attach()
+          ..style.width = '100%'
+          ..style.height = '100%'
+          ..style.objectFit = _getObjectFit(mode);
         debug('Created local video track view for: $localParticipantSid');
-        return localVideoTrackElement;
+        return DivElement()..append(localVideoTrackElement);
       } else {
         // TODO: review behaviour in scenario where `_room` is `null`.
         return DivElement();
@@ -68,9 +71,12 @@ class ProgrammableVideoPlugin extends ProgrammableVideoPlatform {
       final remoteVideoTrack = _room?.participants.toDartMap()[remoteParticipantSid]?.videoTracks.toDartMap()[remoteVideoTrackSid]?.track;
       // TODO: flatten this out
       if (remoteVideoTrack != null) {
-        final remoteVideoTrackElement = remoteVideoTrack.attach()..style.objectFit = _getObjectFit(mode);
+        final remoteVideoTrackElement = remoteVideoTrack.attach()
+          ..style.width = '100%'
+          ..style.height = '100%'
+          ..style.objectFit = _getObjectFit(mode);
         debug('Created remote video track view for: $remoteParticipantSid');
-        return remoteVideoTrackElement;
+        return DivElement()..append(remoteVideoTrackElement);
       } else {
         // TODO: review behaviour in scenario where `_room` is `null`.
         return DivElement();
