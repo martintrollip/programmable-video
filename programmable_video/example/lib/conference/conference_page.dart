@@ -102,8 +102,8 @@ class _ConferencePageState extends State<ConferencePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      onPopInvoked: (_) async => false,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: buildLayout(),
