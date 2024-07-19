@@ -53,6 +53,7 @@ class Iterator<T> {
 @JS()
 class IteratorValue<T> {
   external T get value;
+
   external bool get done;
 
   external factory IteratorValue();
