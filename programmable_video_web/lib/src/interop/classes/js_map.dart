@@ -44,6 +44,7 @@ extension Interop<K, V> on JSMap<K, V> {
 }
 
 @JS()
+@staticInterop
 class Iterator<T> {
   external IteratorValue<T> next();
 
