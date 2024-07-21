@@ -45,10 +45,10 @@ extension Interop<K, V> on JSMap<K, V> {
 
 @JS()
 @staticInterop
-class Iterator<T> {
+class CustomIterator<T> {
   external IteratorValue<T> next();
 
-  external factory Iterator();
+  external factory CustomIterator();
 }
 
 @JS()
