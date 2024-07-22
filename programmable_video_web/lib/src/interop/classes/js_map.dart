@@ -10,13 +10,13 @@ class JSMap<K, V> {
   /// The [JSIterator] returns the key value pairs as a [List<dynamic>].
   /// The [List] always contains two elements. The first is the key and the second is the value.
   @JS('prototype.entries')
-  external JSIterator<List<dynamic>> entries();
+  external dynamic entries();
 
   @JS('prototype.keys')
-  external JSIterator<K> keys();
+  external dynamic keys();
 
   @JS('prototype.values')
-  external JSIterator<V> values();
+  external dynamic values();
 
   external int get size;
 
@@ -59,7 +59,7 @@ class IteratorValue<T> {
 }
 
 List<T> iteratorToList<T, V>(
-  JSIterator<V> iterator,
+  dynamic iterator,
   T Function(V value) mapper,
 ) {
   final list = <T>[];
@@ -75,7 +75,7 @@ List<T> iteratorToList<T, V>(
 }
 
 void iteratorForEach<V>(
-  JSIterator<V> iterator,
+  dynamic iterator,
   bool Function(V value) mapper,
 ) {
   var result = iterator.next();
