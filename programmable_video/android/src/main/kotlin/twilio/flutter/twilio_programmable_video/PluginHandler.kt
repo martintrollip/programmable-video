@@ -438,7 +438,7 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
         // bottom speaker.
         if (!audioSettings.bluetoothPreferred ||
                 BluetoothProfile.STATE_CONNECTED != BluetoothAdapter.getDefaultAdapter()?.getProfileConnectionState(BluetoothProfile.HEADSET)) {
-            debug("setSpeakerPhoneOnInternal => on: ${audioSettings.speakerEnabled}\n bluetoothEnable: ${audioSettings.bluetoothPreferred}\n bluetoothScoOn: ${audioManager.isBluetoothScoOn}\n bluetoothProfileConnectionState: $bluetoothProfileConnectionState")
+            debug("setSpeakerPhoneOnInternal => applySpeakerPhoneSettings")
             applySpeakerPhoneSettings()
         }
     }
