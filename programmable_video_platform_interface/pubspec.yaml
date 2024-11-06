@@ -3,7 +3,7 @@ description: A common platform interface for the programmable_video plugin.
 homepage: https://gitlab.com/twilio-flutter/programmable-video
 repository: https://gitlab.com/twilio-flutter/programmable-video/-/tree/master/programmable_video
 issue_tracker: https://gitlab.com/twilio-flutter/programmable-video/issues
-version: 1.3.3
+version: 1.3.4
 
 environment:
   sdk: '>=3.3.0-0 <4.0.0'
