@@ -27,6 +27,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
 android {
+    namespace 'twilio.flutter.twilio_programmable_video'
+
     compileSdkVersion 31
 
     sourceSets {
